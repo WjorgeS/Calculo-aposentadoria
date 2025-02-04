@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Aposentadoria</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url(https://www.feebpr.org.br/images/media/7103082226218b69c1e691.jpg);
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 6px rgb(255, 255, 255);
+            border-radius: 16px;
+            background-color: rgb(26, 89, 206);
+        }
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .gender {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 8px;
+        }
+        .gender label {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Aposentadoria</h1>
+        <label for="age">Sua idade</label>
+        <input type="number" id="age" placeholder="Sua idade" required>
+        <label for="contribution">Tempo de contribuição (anos)</label>
+        <input type="number" id="contribution" placeholder="Tempo de contribuição (anos)" required>
+        <label for="insalubridade">Insalubridade (anos)</label>
+        <input type="number" step="0.1" id="insalubridade" placeholder="Insalubridade (anos)" required>
+        <div class="gender">
+            <label>
+                <input type="radio" name="gender" value="male" required> Masculino
+            </label>
+            <label>
+                <input type="radio" name="gender" value="female" required> Feminino
+            </label>
+        </div>
+        <button onclick="calculateRetirement()">Calcular</button>
+        <p id="result"></p>
+        <p id="result1"></p>
+    </div>
+
+    <script>
+        function calculateRetirement() {
+            const age = parseInt(document.getElementById('age').value, 10) || 0;
+            let contribution = parseInt(document.getElementById('contribution').value, 10) || 0;
+            const insalubridade = parseFloat(document.getElementById('insalubridade').value) || 0;
+
+            // Verifica se o gênero foi selecionado
+            const genderElement = document.querySelector('input[name="gender"]:checked');
+            if (!genderElement) {
+                document.getElementById('result').innerText = "Por favor, selecione o gênero.";
+                return;
+            }
+            const gender = genderElement.value;
+
+            // Fator de insalubridade
+            const fatorInsalubridade = 1.4;
+            const reducaoTempo = insalubridade * fatorInsalubridade;
+            contribution += Math.round(reducaoTempo);
+
+            // Regras de aposentadoria
+            let retirementAge = 65;
+            let minContribution = 35;
+
+            if (gender === 'female') {
+                retirementAge = 60;
+                minContribution = 30;
+            }
+
+            // Verifica se pode se aposentar
+            if (age >= retirementAge && contribution >= minContribution) {
+                document.getElementById('result').innerText = "Você já pode se aposentar!";
+            } else {
+                const ageDiff = Math.max(0, retirementAge - age);
+                const contributionDiff = Math.max(0, minContribution - contribution);
+
+                if (ageDiff > 0 && contributionDiff > 0) {
+                    document.getElementById('result').innerText = `Faltam ${ageDiff} anos de idade e ${contributionDiff} anos de contribuição para aposentadoria.`;
+                } else if (ageDiff > 0) {
+                    document.getElementById('result').innerText = `Faltam ${ageDiff} anos para alcançar a idade mínima de aposentadoria.`;
+                } else {
+                    document.getElementById('result').innerText = `Faltam ${contributionDiff} anos para completar o tempo de contribuição.`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
